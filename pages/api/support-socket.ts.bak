@@ -1,0 +1,197 @@
+import { NextApiRequest, NextApiResponse } from "next";
+import { Server as SocketIOServer } from "socket.io";
+import { Server as NetServer } from "http";
+import dbConnect from "@/lib/mongodb";
+import SupportMessage from "@/models/SupportMessage";
+
+export type NextApiResponseServerIO = NextApiResponse & {
+  socket: {
+    server: NetServer & {
+      io: SocketIOServer;
+    };
+  };
+};
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+const SocketHandler = (req: NextApiRequest, res: NextApiResponseServerIO) => {
+  console.log("Socket API route called", { method: req.method, url: req.url });
+
+  // Initialize socket server if not already done
+  if (!res.socket.server.io) {
+    console.log("Setting up socket server");
+    const io = new SocketIOServer(res.socket.server, {
+      path: "/api/support-socket",
+      cors: {
+        origin: "*",
+        methods: ["GET", "POST"],
+      },
+      transports: ["websocket", "polling"],
+    });
+
+    res.socket.server.io = io;
+
+    io.on("connection", (socket) => {
+      console.log("Client connected:", socket.id);
+
+      socket.on("join", ({ userId, role }) => {
+        console.log("Client joining:", { userId, role });
+        if (role === "seller") {
+          // Join seller-specific room
+          socket.join(`seller-${userId}`);
+          console.log(`Seller ${userId} joined room: seller-${userId}`);
+        } else if (role === "admin") {
+          // Join admin room
+          socket.join("admin");
+          console.log("Admin joined admin room");
+        }
+      });
+
+      socket.on("support-message", async (msg) => {
+        console.log("Received support message:", {
+          ...msg,
+          image: msg.image
+            ? `[BASE64_IMAGE_${msg.image.length}_chars]`
+            : undefined,
+        });
+
+        if (!msg.senderId) {
+          console.error("Received support-message with empty senderId", msg);
+          return;
+        }
+
+        try {
+          await dbConnect();
+          const savedMessage = await SupportMessage.create({
+            senderId: msg.senderId,
+            senderRole: msg.senderRole,
+            receiverId: msg.receiverId,
+            message: msg.message,
+            image: msg.image, // Include image if present
+            createdAt: msg.createdAt || new Date(),
+            seenByAdmin: msg.senderRole === "admin" ? true : false, // Admin messages are seen immediately
+            seenBySeller: msg.senderRole === "seller" ? true : false, // Seller messages are seen immediately
+          });
+          console.log(
+            "Message saved to database:",
+            savedMessage._id,
+            "Image present:",
+            !!msg.image
+          );
+        } catch (err) {
+          console.error("Failed to save support message:", err);
+          return; // Don't broadcast if save failed
+        }
+
+        if (msg.senderRole === "seller") {
+          // Send to admin room - admin will filter based on receiverId
+          socket.to("admin").emit("support-message", msg);
+          console.log(
+            "Message sent to admin room",
+            "Image present:",
+            !!msg.image
+          );
+        } else if (msg.senderRole === "admin") {
+          // Send to specific seller room
+          const targetSellerId = msg.receiverId;
+          if (targetSellerId) {
+            socket.to(`seller-${targetSellerId}`).emit("support-message", msg);
+            console.log(
+              `Message sent to seller room: seller-${targetSellerId}`,
+              "Image present:",
+              !!msg.image
+            );
+          } else {
+            console.error("Admin message missing receiverId:", msg);
+          }
+        }
+      });
+
+      // Handle marking messages as seen by admin
+      socket.on("mark-messages-seen", async ({ sellerId }) => {
+        console.log("Marking messages as seen for seller:", sellerId);
+        if (!sellerId) {
+          console.error("Missing sellerId in mark-messages-seen");
+          return;
+        }
+
+        try {
+          await dbConnect();
+          const result = await SupportMessage.updateMany(
+            {
+              senderId: sellerId,
+              senderRole: "seller",
+              seenByAdmin: { $ne: true },
+            },
+            {
+              $set: { seenByAdmin: true },
+            }
+          );
+          console.log(
+            `Messages marked as seen for seller ${sellerId}:`,
+            result.modifiedCount,
+            "messages updated"
+          );
+        } catch (err) {
+          console.error("Failed to mark messages as seen:", err);
+        }
+      });
+
+      // Handle marking messages as seen by seller
+      socket.on("mark-messages-seen-by-seller", async ({ sellerId }) => {
+        console.log("Marking admin messages as seen by seller:", sellerId);
+        if (!sellerId) {
+          console.error("Missing sellerId in mark-messages-seen-by-seller");
+          return;
+        }
+
+        try {
+          await dbConnect();
+          const result = await SupportMessage.updateMany(
+            {
+              senderRole: "admin",
+              receiverId: sellerId,
+              seenBySeller: { $ne: true },
+            },
+            {
+              $set: { seenBySeller: true },
+            }
+          );
+          console.log(
+            `Admin messages marked as seen by seller ${sellerId}:`,
+            result.modifiedCount,
+            "messages updated"
+          );
+        } catch (err) {
+          console.error(
+            "Failed to mark admin messages as seen by seller:",
+            err
+          );
+        }
+      });
+
+      socket.on("disconnect", () => {
+        console.log("Client disconnected:", socket.id);
+      });
+    });
+
+    console.log("Socket server is set up");
+  } else {
+    console.log("Socket server already running");
+  }
+
+  // Handle GET requests
+  if (req.method === "GET") {
+    res.status(200).json({ message: "Socket server is running" });
+    return;
+  }
+
+  // Handle other requests
+  res.end();
+};
+
+export default SocketHandler;

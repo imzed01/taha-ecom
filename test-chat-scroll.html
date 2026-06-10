@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Scroll Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .test-header {
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .test-content {
+            padding: 20px;
+        }
+
+        .test-step {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            background: #f8f9fa;
+        }
+
+        .test-step h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+
+        .test-step ol {
+            margin: 10px 0;
+        }
+
+        .test-step li {
+            margin: 5px 0;
+        }
+
+        .expected-behavior {
+            background: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+
+        .expected-behavior h3 {
+            color: #28a745;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+            color: #856404;
+        }
+
+        .warning h3 {
+            color: #ffc107;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>Chat Auto-Scroll Fix Test</h1>
+            <p>Testing the enhanced chat scroll behavior</p>
+        </div>
+
+        <div class="test-content">
+            <div class="test-step">
+                <h3>🔧 What Was Fixed</h3>
+                <ol>
+                    <li><strong>Socket Timeout Error</strong> - Reduced timeout and improved connection handling</li>
+                    <li><strong>Auto-scroll Prevention</strong> - Multiple layers of scroll detection</li>
+                    <li><strong>User Intent Detection</strong> - Tracks when user manually scrolls up</li>
+                    <li><strong>Smart Re-enabling</strong> - Only re-enables auto-scroll when appropriate</li>
+                </ol>
+            </div>
+
+            <div class="test-step expected-behavior">
+                <h3>✅ Expected Behavior (Should Work Now)</h3>
+                <ol>
+                    <li><strong>Scroll up to read previous messages</strong> → Chat stays where you scrolled</li>
+                    <li><strong>New messages arrive while reading history</strong> → No auto-scroll interference</li>
+                    <li><strong>Scroll back to bottom</strong> → Auto-scroll re-enables for new messages</li>
+                    <li><strong>Send a message</strong> → Always scrolls to show your new message</li>
+                    <li><strong>Socket connection</strong> → No more timeout errors</li>
+                </ol>
+            </div>
+
+            <div class="test-step warning">
+                <h3>⚠️ Test Steps</h3>
+                <ol>
+                    <li>Open the chat in your application</li>
+                    <li>Send a few messages to create chat history</li>
+                    <li><strong>Scroll up</strong> to read previous messages</li>
+                    <li>Have someone send you a message (or wait for a new message)</li>
+                    <li><strong>Verify</strong> that the chat doesn't automatically scroll down</li>
+                    <li>Scroll back to the bottom</li>
+                    <li><strong>Verify</strong> that new messages now auto-scroll into view</li>
+                </ol>
+            </div>
+
+            <div class="test-step">
+                <h3>🐛 Debug Information</h3>
+                <p>If you still experience issues, check the browser console for these debug messages:</p>
+                <ul>
+                    <li><code>"User scrolling up - disabling auto-scroll permanently"</code></li>
+                    <li><code>"User at bottom - enabling auto-scroll"</code></li>
+                    <li><code>"Manual scroll start - disabling auto-scroll"</code></li>
+                    <li><code>"Scroll timeout - resetting user scrolling state"</code></li>
+                </ul>
+                <p>These messages help track the scroll behavior and identify any remaining issues.</p>
+            </div>
+
+            <div class="test-step expected-behavior">
+                <h3>🎯 Key Improvements</h3>
+                <ul>
+                    <li><strong>Multiple Prevention Layers</strong> - 6 different conditions must be met for auto-scroll
+                    </li>
+                    <li><strong>Persistent State</strong> - Once you scroll up, auto-scroll stays disabled</li>
+                    <li><strong>Smart Re-enabling</strong> - Only re-enables when you send a message or reach bottom
+                    </li>
+                    <li><strong>Better Performance</strong> - Throttled scroll handlers and efficient event management
+                    </li>
+                    <li><strong>Mobile Support</strong> - Touch event handling with passive listeners</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

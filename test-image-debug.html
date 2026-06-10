@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .image-test {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+
+        .image-test img {
+            max-width: 200px;
+            max-height: 200px;
+            border: 1px solid red;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Image Debug Test</h1>
+
+    <div class="image-test">
+        <h3>Test 1: Unsplash Image (should work)</h3>
+        <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400" alt="Test Image 1"
+            onload="console.log('Image 1 loaded successfully')" onerror="console.error('Image 1 failed to load')">
+        <div id="result1"></div>
+    </div>
+
+    <div class="image-test">
+        <h3>Test 2: Another Unsplash Image</h3>
+        <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400" alt="Test Image 2"
+            onload="console.log('Image 2 loaded successfully')" onerror="console.error('Image 2 failed to load')">
+        <div id="result2"></div>
+    </div>
+
+    <div class="image-test">
+        <h3>Test 3: Invalid Image URL</h3>
+        <img src="https://invalid-url-that-does-not-exist.com/image.jpg" alt="Invalid Image"
+            onload="console.log('Invalid image loaded (unexpected)')"
+            onerror="console.error('Invalid image failed to load (expected)')">
+        <div id="result3"></div>
+    </div>
+
+    <script>
+        // Test image loading
+        document.querySelectorAll('img').forEach((img, index) => {
+            img.addEventListener('load', function () {
+                console.log(`Image ${index + 1} loaded successfully`);
+                document.getElementById(`result${index + 1}`).innerHTML =
+                    '<span class="success">✅ Image loaded successfully</span>';
+            });
+
+            img.addEventListener('error', function () {
+                console.error(`Image ${index + 1} failed to load`);
+                document.getElementById(`result${index + 1}`).innerHTML =
+                    '<span class="error">❌ Image failed to load</span>';
+            });
+        });
+
+        // Test fetch to see if URLs are accessible
+        async function testImageURLs() {
+            const testUrls = [
+                'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400',
+                'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'
+            ];
+
+            for (let i = 0; i < testUrls.length; i++) {
+                try {
+                    const response = await fetch(testUrls[i], { method: 'HEAD' });
+                    console.log(`URL ${i + 1} fetch result:`, response.status, response.statusText);
+                } catch (error) {
+                    console.error(`URL ${i + 1} fetch error:`, error.message);
+                }
+            }
+        }
+
+        testImageURLs();
+    </script>
+</body>
+
+</html>
