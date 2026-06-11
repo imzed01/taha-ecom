@@ -1,6 +1,6 @@
-import dbConnect from '../../lib/dbConnect';
-import User from '../../models/User';
-import bcrypt from 'bcryptjs';
+const dbConnect = require('../../lib/dbConnect').default;
+const User = require('../../models/User').default;
+const bcrypt = require('bcryptjs');
 
 export default async function handler(req, res) {
   if (req.query.secret !== 'setup-taha-2024') {
@@ -10,7 +10,6 @@ export default async function handler(req, res) {
   try {
     await dbConnect();
 
-    // Delete old admin if exists
     await User.deleteOne({ email: 'admin@essbyebay.com' });
 
     const hashedPassword = await bcrypt.hash('admin123', 10);
