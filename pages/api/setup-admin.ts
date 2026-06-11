@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import dbConnect from '../../lib/dbConnect';
+import connectDB from '../../lib/mongodb';
 import User from '../../models/User';
 import bcrypt from 'bcryptjs';
 
@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    await dbConnect();
+    await connectDB();
 
     await User.deleteOne({ email: 'admin@essbyebay.com' });
 
