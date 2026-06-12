@@ -101,7 +101,6 @@ export default function AdminSellerDetailPage() {
               const walletData = await walletRes.json();
               setWallet(walletData);
             }
-          }
         } else {
           toast.error("Seller not found");
           router.push("/admin/sellers");
