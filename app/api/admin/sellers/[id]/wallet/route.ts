@@ -4,17 +4,17 @@ import Wallet from '@/models/Wallet';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     await dbConnect();
     
-    const wallet = await Wallet.findOne({ sellerId: params.id });
+    const wallet = await Wallet.findOne({ sellerId: id });
     
     if (!wallet) {
-      // Create wallet if it doesn't exist
       const newWallet = await Wallet.create({
-        sellerId: params.id,
+        sellerId: id,
         balance: 0,
         pendingBalance: 0,
         totalEarned: 0,
