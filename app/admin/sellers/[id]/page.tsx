@@ -93,14 +93,15 @@ export default function AdminSellerDetailPage() {
         const sellers = await response.json();
         const foundSeller = sellers.find((s: Seller) => s._id === sellerId);
         if (foundSeller) {
-          setSeller(foundSeller);
-          // Fetch wallet
-          const walletRes = await fetch(`/api/admin/sellers/${sellerId}/wallet`);
-          if (walletRes.ok) {
-            const walletData = await walletRes.json();
-            setWallet(walletData);
+            setSeller(foundSeller);
+            fetchSellerImages();
+            // Fetch wallet
+            const walletRes = await fetch(`/api/admin/sellers/${sellerId}/wallet`);
+            if (walletRes.ok) {
+              const walletData = await walletRes.json();
+              setWallet(walletData);
+            }
           }
-          fetchSellerImages();
         } else {
           toast.error("Seller not found");
           router.push("/admin/sellers");
@@ -467,31 +468,31 @@ export default function AdminSellerDetailPage() {
                 </div>
               </div>
             )}
-
+            
             {/* Wallet */}
             <div className="card mt-6">
               <div className="p-6 border-b border-border">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-foreground">
                     💳 Wallet
                   </h3>
-                  <button onClick={fetchSellerDetails} className="text-muted-foreground hover:text-foreground">
+                  <button onClick={fetchSellerDetails}>
                     <RefreshCw className="w-4 h-4" />
                   </button>
                 </div>
               </div>
               <div className="p-6">
                 {wallet ? (
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-center">
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div>
                       <p className="text-sm text-muted-foreground">Available</p>
                       <p className="text-lg font-bold text-green-600">${wallet.balance.toFixed(2)}</p>
                     </div>
-                    <div className="text-center">
+                    <div>
                       <p className="text-sm text-muted-foreground">Pending</p>
                       <p className="text-lg font-bold text-yellow-600">${wallet.pendingBalance.toFixed(2)}</p>
                     </div>
-                    <div className="text-center">
+                    <div>
                       <p className="text-sm text-muted-foreground">Total Earned</p>
                       <p className="text-lg font-bold text-blue-600">${wallet.totalEarned.toFixed(2)}</p>
                     </div>
