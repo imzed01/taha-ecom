@@ -472,29 +472,44 @@ export default function AdminSellerDetailPage() {
             <div className="card mt-6">
               <div className="p-6 border-b border-border">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-foreground">
-                    💳 Wallet
+                  <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                    🪙 Wallet
                   </h3>
-                  <button onClick={fetchSellerDetails}>
+                  <button onClick={() => {
+                    fetch(`/api/admin/sellers/${sellerId}/wallet`)
+                      .then(res => res.json())
+                      .then(data => setWallet(data));
+                  }}>
                     <RefreshCw className="w-4 h-4" />
                   </button>
                 </div>
               </div>
               <div className="p-6">
                 {wallet ? (
-                  <div className="grid grid-cols-3 gap-4 text-center">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Available</p>
-                      <p className="text-lg font-bold text-green-600">${wallet.balance.toFixed(2)}</p>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-3 gap-4 text-center">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Available</p>
+                        <p className="text-xl font-bold">${wallet.balance.toFixed(2)}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Pending</p>
+                        <p className="text-xl font-bold">${wallet.pendingBalance.toFixed(2)}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Total Earned</p>
+                        <p className="text-xl font-bold">${wallet.totalEarned.toFixed(2)}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Pending</p>
-                      <p className="text-lg font-bold text-yellow-600">${wallet.pendingBalance.toFixed(2)}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Total Earned</p>
-                      <p className="text-lg font-bold text-blue-600">${wallet.totalEarned.toFixed(2)}</p>
-                    </div>
+                    <p className="text-xs text-muted-foreground text-center">
+                      Last updated {new Date().toLocaleString()}
+                    </p>
+                    <button
+                      onClick={() => router.push(`/admin/wallet?sellerId=${sellerId}`)}
+                      className="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                    >
+                      🪙 Manage Wallet
+                    </button>
                   </div>
                 ) : (
                   <p className="text-muted-foreground text-sm text-center">No wallet found</p>
