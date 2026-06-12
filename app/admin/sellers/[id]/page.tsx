@@ -14,6 +14,7 @@ import {
   ZoomOut,
   RefreshCw,
   User,
+  Wallet,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import DashboardLayout from "@/components/DashboardLayout";
@@ -473,7 +474,7 @@ export default function AdminSellerDetailPage() {
               <div className="p-6 border-b border-border">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wallet w-5 h-5" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg> Wallet
+                    <Wallet className="w-5 h-5" /> Wallet Wallet
                   </h3>
                   <button onClick={() => {
                     fetch(`/api/admin/sellers/${sellerId}/wallet`)
@@ -508,7 +509,7 @@ export default function AdminSellerDetailPage() {
                       onClick={() => router.push(`/admin/wallet?sellerId=${sellerId}`)}
                       className="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wallet w-5 h-5" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg> Manage Wallet
+                    <Wallet className="w-5 h-5" /> Manage Wallet
                     </button>
                   </div>
                 ) : (
