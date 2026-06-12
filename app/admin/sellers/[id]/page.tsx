@@ -140,15 +140,6 @@ export default function AdminSellerDetailPage() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [selectedImage]);
 
-  useEffect(() => {
-    if (sellerId) {
-      fetch(`/api/admin/sellers/${sellerId}/wallet`)
-        .then(res => res.json())
-        .then(data => setWallet(data))
-        .catch(err => console.error('Wallet fetch error:', err));
-    }
-  }, [sellerId]);
-
   const handleVerification = async (status: "verified" | "rejected") => {
     try {
       const response = await fetch(`/api/admin/sellers/${sellerId}/verify`, {
